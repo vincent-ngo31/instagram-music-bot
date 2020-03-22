@@ -1,6 +1,6 @@
 spotify_user_id = '1247633538'
 spotify_password = 'Invincible31'
-spotify_token = 'BQCKBXErtJ0zwjl-GSVFpt3iGQF-FcQFcYafjSh4EJheOTFJYaZRbcyuIRTrWNS22szHEm3u7eyoNrZEp-wtGFbOgN76frGZZpurhRnz07d9AFxmmVf4DUJWe3fRr5tEy8y-FMeEhk4FM-w3f4IGixKIqH6w2b8SUF4oTwudZB9Rdr4'
+spotify_token = 'BQBdPnLt5zVx69QkvynARpqaY_L25R5UoVGsZ6cV4RlJbfiCz-Q033GHRH630WATkbbn_vtAJujVjnD32_fjjuMGr836bP3Kpcg50Suwgs7OAPv1MsKp0iXQO1xRDHO63Q6elEbNY681xC95NqjcxIHUlIRG6P7XFhtv96_LTIuOdR8wT8Q0_GN6oDzY'
 
 instagram_user_id = 'vincentdngo'
 instagram_password = 'Invincible31!'

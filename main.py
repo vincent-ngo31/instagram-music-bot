@@ -3,18 +3,17 @@ Tools
 - Selenium
 - Spotify Web API
 
-
 Steps:
-- Login to Instagram and Spotify with my accounts
-- Access the Stories of the users I follow
+- Login to Instagram and Spotify with your accounts
+- Access the Stories of the users you follow
 - Check if they shared a Spotify song on their story
 - If so, add it to a custom “IG Music” playlist
 - Rerun once every 24 hours
 
 Notes:
-- How to parse song name and artist name? open.spotify url
-- automate token
 - replace sleep with wait
+- automate token
+- automate script to run once a day
 """
 
 import json
@@ -25,7 +24,7 @@ from selenium.webdriver.common.keys import Keys
 
 from secrets import spotify_user_id, spotify_password, spotify_token, instagram_user_id, instagram_password
 
-class CreateInstagramPlaylist:
+class InstagramToSpotifyBot:
     def __init__(self):
         self.spotify_user_id = spotify_user_id
         self.spotify_password = spotify_password
@@ -39,9 +38,10 @@ class CreateInstagramPlaylist:
         chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
         self.driver = webdriver.Chrome(options=chrome_options)
 
+    def setup(self):
         # open spotify
         self.driver.get("https://open.spotify.com")
-        self.login_to_spotify(spotify_user_id, spotify_password)
+        self._login_to_spotify(spotify_user_id, spotify_password)
         
         # open instagram
         self.driver.execute_script('window.open("https://instagram.com","_blank");')
@@ -53,24 +53,7 @@ class CreateInstagramPlaylist:
         
         # start 
         self.driver.switch_to_window(self.driver.window_handles[0])
-        self.login_to_instagram(instagram_user_id, instagram_password)
-        self.get_songs_from_stories()
-    
-    def login_to_instagram(self, instagram_user_id, instagram_password):
-        self.driver.find_element_by_name("username").send_keys(instagram_user_id)
-        self.driver.find_element_by_name("password").send_keys(instagram_password)
-        self.driver.find_element_by_xpath("//button[@type='submit']").click()
-        sleep(3)
-        self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
-        sleep(3)
-    
-    def login_to_spotify(self, spotify_user_id, spotify_password):
-        self.driver.find_element_by_xpath("//button[contains(text(), 'Log in')]").click()
-        sleep(3)
-        self.driver.find_element_by_name("username").send_keys(spotify_user_id)
-        self.driver.find_element_by_name("password").send_keys(spotify_password)
-        self.driver.find_element_by_id("login-button").click()
-        sleep(3)
+        self._login_to_instagram(instagram_user_id, instagram_password)
 
     def get_songs_from_stories(self):
         # Start watching stories
@@ -79,8 +62,6 @@ class CreateInstagramPlaylist:
         
         story = self.driver.find_element_by_xpath("//div[@role='dialog']")
         while story:
-            # Check for Spotify song
-            # play_song = self.driver.find_element_by_xpath("//div[contains(text(), 'Play on Spotify')]")
 
             # "Right" button
             right = self.driver.find_element_by_xpath("//div[@class='coreSpriteRightChevron']")
@@ -107,17 +88,69 @@ class CreateInstagramPlaylist:
                 self.driver.switch_to_window(self.driver.window_handles[0])
                 right.click()
                 sleep(1)
-                
+
             except Exception:
                 right.click()
                 sleep(1)
         
         return self.all_track_uris
-            
-    def create_playlist(self):
+    
+    def add_songs_to_playlist(self):
+        # collect all track uri's
+        uris = self.all_track_uris
+
+        # navigate playlists
+        get_query = "https://api.spotify.com/v1/users/{}/playlists".format(spotify_user_id)
+        get_response = requests.get(
+            get_query,
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {}".format(spotify_token)
+            }
+        )
+
+        get_response_json = get_response.json()
+        playlist_names = get_response_json['items']['name']
+
+        # if user does not have a playlist that matches this self.playlist_id
+        if "Instagram Recommendations" not in playlist_names:
+            self._create_playlist()
+        
+        # add songs to playlist
+        request_data = json.dumps(uris)
+        post_query = "https://api.spotify.com/v1/playlists/{}/tracks".format(self.playlist_id)
+        post_response = requests.post(
+            post_query,
+            data=request_data,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {}".format(spotify_token)
+            }
+        )
+
+        return post_response.json()
+
+    def _login_to_instagram(self, instagram_user_id, instagram_password):
+        self.driver.find_element_by_name("username").send_keys(instagram_user_id)
+        self.driver.find_element_by_name("password").send_keys(instagram_password)
+        self.driver.find_element_by_xpath("//button[@type='submit']").click()
+        sleep(3)
+        self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
+        sleep(3)
+    
+    def _login_to_spotify(self, spotify_user_id, spotify_password):
+        self.driver.find_element_by_xpath("//button[contains(text(), 'Log in')]").click()
+        sleep(3)
+        self.driver.find_element_by_name("username").send_keys(spotify_user_id)
+        self.driver.find_element_by_name("password").send_keys(spotify_password)
+        self.driver.find_element_by_id("login-button").click()
+        sleep(3)
+    
+    def _create_playlist(self):
         request_body = json.dumps({
             "name": "Instagram Recommendations",
-            "description": "Songs shared to Stories by people I follow",
+            "description": "Scraped from my Stories feed using Instagram bot (@vincentdngo)",
             "public": False
         })
 
@@ -134,56 +167,8 @@ class CreateInstagramPlaylist:
 
         # playlist id
         self.playlist_id = response_json['id']
-    
-    def add_song_to_playlist(self):
-        # collect all track uri's
-        uris = self.all_track_uris
 
-        # navigate playlists
-        # if user does not have a playlist that matches this self.playlist_id
-            # playlist_id = self.create_playlist()
-        # add song to playlist
-        request_data = json.dumps(uris)
-
-        query = "https://api.spotify.com/v1/playlists/{}/tracks".format(self.playlist_id)
-
-        response = requests.post(
-            query,
-            data=request_data,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": "Bearer {}".format(spotify_token)
-            }
-        )
-
-        # check for valid response status
-        if response.status_code != 200:
-            raise Exception(response.status_code)
-
-        response_json = response.json()
-        return response_json
-        
-    # def get_spotify_uri(self, track_id, spotify_token):
-    #     "Search for song"
-    #     query = "https://api.spotify.com/v1/tracks/{}".format(track_id)
-    #     response = requests.get(
-    #         query,
-    #         headers={
-    #             "Content-Type": "application/json",
-    #             "Authorization": "Bearer {}".format(spotify_token)
-    #         }
-    #     )
-    #     response_json = response.json()
-    #     print(response_json['uri'])
-    #     # songs = response_json["tracks"]["items"]
-
-    #     # # only use the first song
-    #     # uri = songs[0]["uri"]
-
-    #     # return uri
-    
-
-
-bot = CreateInstagramPlaylist()
-# bot.login_to_instagram(instagram_user_id, instagram_password)
-# bot.get_songs_from_stories()
+bot = InstagramToSpotifyBot()
+bot.setup()
+bot.get_songs_from_stories()
+bot.add_songs_to_playlist()
