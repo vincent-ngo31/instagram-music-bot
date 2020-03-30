@@ -70,20 +70,14 @@ class InstagramToSpotifyBot:
 
     def get_songs_from_stories(self):
         # Start watching stories
-        # try:
-        #     self._wait(EC.presence_of_element_located((By.CLASS_NAME, "c6Ldk"))).click()
-        # except Exception:
-        self._wait(EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Watch All')]"))).click()
-        
-        # self.driver.find_element_by_class_name("c6Ldk").click()
+
+        # self._wait(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Watch All')]")))
         # self.driver.find_element_by_xpath("//div[contains(text(), 'Watch All')]").click()
-        
-        # Click on first story
         # self._wait(EC.presence_of_element_located((By.CLASS_NAME, "c6Ldk"))).click()
-        
-        # self._wait(EC.presence_of_element_located((By.CLASS_NAME, "z60dz")))
-        # story = self._wait(EC.visibility_of_element_located((By.CLASS_NAME, "z60dz")))
-        # story = self.driver.find_element_by_xpath("//div[@role='dialog']")
+        # self.driver.find_element_by_class_name("c6Ldk").click()
+        self.driver.implicitly_wait(5)
+        self.driver.find_element_by_xpath("//div[contains(text(), 'Watch All')]").click()
+
         
         # viewing_story = self._wait(EC.presence_of_element_located((By.XPATH, "//div[@role='dialog']")))
         viewing_story = self._wait(EC.url_contains('stories'))
