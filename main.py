@@ -18,6 +18,7 @@ Notes:
 import json
 import requests
 from time import sleep
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -35,6 +36,9 @@ class InstagramToSpotifyBot:
         self.all_track_uris = []
         self.playlist_id = ''
 
+        current_time = datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")
+        print('Current Time: ', current_time)
+
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
         self.driver = webdriver.Chrome(options=chrome_options)
@@ -44,29 +48,32 @@ class InstagramToSpotifyBot:
         self.driver.find_element_by_xpath("//button[contains(text(), 'Get Token')]").click()
         self._wait(EC.element_to_be_clickable((By.ID, "oauthRequestToken")))
         self.driver.find_element_by_id("oauthRequestToken").click()
-
         self._login_to_spotify(spotify_user_id, spotify_password)
-
         self.spotify_token = self.driver.find_element_by_id("oauth-input").get_attribute("value")
 
-    def setup(self):
-        # open spotify
-        # self.driver.get("https://open.spotify.com")
-        # self._login_to_spotify(spotify_user_id, spotify_password)
-
-        # open instagram
-        # self.driver.execute_script('window.open("https://instagram.com","_blank");')
+        # Login to Instagram
         self.driver.get("https://instagram.com")
         self._wait(EC.presence_of_element_located((By.NAME, "username")))
-
-        # close spotify
-        # self.driver.switch_to_window(self.driver.window_handles[0])
-        # self.driver.close()
-        
-        # start 
-        # self.driver.switch_to_window(self.driver.window_handles[0])
-        self._wait(EC.presence_of_element_located((By.NAME, "username")))
         self._login_to_instagram(instagram_user_id, instagram_password)
+
+    # def setup(self):
+    #     # open spotify
+    #     # self.driver.get("https://open.spotify.com")
+    #     # self._login_to_spotify(spotify_user_id, spotify_password)
+
+    #     # open instagram
+    #     # self.driver.execute_script('window.open("https://instagram.com","_blank");')
+    #     self.driver.get("https://instagram.com")
+    #     self._wait(EC.presence_of_element_located((By.NAME, "username")))
+
+    #     # close spotify
+    #     # self.driver.switch_to_window(self.driver.window_handles[0])
+    #     # self.driver.close()
+        
+    #     # start 
+    #     # self.driver.switch_to_window(self.driver.window_handles[0])
+    #     self._wait(EC.presence_of_element_located((By.NAME, "username")))
+    #     self._login_to_instagram(instagram_user_id, instagram_password)
 
     def get_songs_from_stories(self):
         # Start watching stories
@@ -74,10 +81,10 @@ class InstagramToSpotifyBot:
         # self._wait(EC.presence_of_element_located((By.XPATH, "//div[contains(text(), 'Watch All')]")))
         # self.driver.find_element_by_xpath("//div[contains(text(), 'Watch All')]").click()
         # self._wait(EC.presence_of_element_located((By.CLASS_NAME, "c6Ldk"))).click()
-        # self.driver.find_element_by_class_name("c6Ldk").click()
+        
         self.driver.implicitly_wait(5)
+        # self.driver.find_element_by_class_name("c6Ldk").click()
         self.driver.find_element_by_xpath("//div[contains(text(), 'Watch All')]").click()
-
         
         # viewing_story = self._wait(EC.presence_of_element_located((By.XPATH, "//div[@role='dialog']")))
         viewing_story = self._wait(EC.url_contains('stories'))
@@ -99,7 +106,8 @@ class InstagramToSpotifyBot:
 
                 # switch to spotify window
                 self.driver.switch_to_window(self.driver.window_handles[1])
-                
+                self._wait(EC.url_contains('track:'))
+
                 # Get track uri from the browser url (ex. https://open.spotify.com/album/600ClrWRsAr7jZ0qjaBLHz?highlight=spotify:track:2Aq78kKI9yuloJQkcbhQbU)
                 url = self.driver.current_url
                 track_tag = 'track:'
@@ -112,28 +120,27 @@ class InstagramToSpotifyBot:
                 self.driver.switch_to_window(self.driver.window_handles[0])
 
                 # Press "right arrow" key
-                # self.driver.find_element_by_css_selector("body").send_keys(Keys.RIGHT)
-                # right.click()
-                self.driver.find_element_by_xpath("//div[@class='coreSpriteRightChevron']").click()
-                # print('pressed right arrow key')
-                self._wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='coreSpriteRightChevron']"))).click()
-                # self.driver.implicitly_wait(1)
+                self.driver.find_element_by_css_selector("body").send_keys(Keys.RIGHT)
+                
+                # self._wait(EC.presence_of_element_located((By.XPATH, "//div[@class='coreSpriteRightChevron']")))
+                # self.driver.find_element_by_xpath("//div[@class='coreSpriteRightChevron']").click()
+                self.driver.implicitly_wait(1)
             
             except Exception:
                 # Press "right arrow" key
-                # self.driver.find_element_by_css_selector("body").send_keys(Keys.RIGHT)
-                # self._wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='coreSpriteRightChevron']"))).click()
-                # right.click()
-                self.driver.find_element_by_xpath("//div[@class='coreSpriteRightChevron']").click()
+                self.driver.find_element_by_css_selector("body").send_keys(Keys.RIGHT)
+                
+                # self._wait(EC.presence_of_element_located((By.XPATH, "//div[@class='coreSpriteRightChevron']")))
+                # self.driver.find_element_by_xpath("//div[@class='coreSpriteRightChevron']").click()
                 # print('pressed right arrow key')
                 self.driver.implicitly_wait(1)
-                              
-                # sleep(2)
-                # self._wait(EC.visibility_of_element_located((By.XPATH, "//div[@role='dialog']")))
-                self._wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='coreSpriteRightChevron']")))
+        
+        if len(self.all_track_uris) > 0:
+            return self.all_track_uris
+        else:
+            print('No songs today!')
+            self.driver.quit()
 
-        return self.all_track_uris
-    
     def add_songs_to_playlist(self):
         # collect all track uri's
         uris = self.all_track_uris
@@ -171,6 +178,7 @@ class InstagramToSpotifyBot:
             return post_response.json()
 
         else:
+            print("No songs recommended today :(")
             self.driver.quit()
 
     def _wait(self, expected_condition):
@@ -257,6 +265,5 @@ class InstagramToSpotifyBot:
     #     print(get_response.json())
 
 bot = InstagramToSpotifyBot()
-bot.setup()
 bot.get_songs_from_stories()
 bot.add_songs_to_playlist()
