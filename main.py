@@ -11,8 +11,10 @@ Actions:
 - If so, adds it to a new custom “Instagram Music” playlist
 - Reruns once every 24 hours
 
-Notes:
+To-do:
 - Automate script to run once a day
+- Figure out token stuff
+- Add user input functionality
 """
 
 import json
@@ -57,7 +59,6 @@ class InstagramToSpotifyBot:
 
 
     def get_songs_from_stories(self):
-        
         # Start watching stories
         self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']"))).click()
         print('Viewing stories...')
@@ -71,15 +72,27 @@ class InstagramToSpotifyBot:
                 # "Open Spotify" pop-up
                 self.driver.find_element_by_class_name("vbsLk").click()
                 self.driver.switch_to_window(self.driver.window_handles[1])
-                self.wait(EC.url_contains('track:'))
+                self.wait(EC.url_contains('spotify'))
 
-                # Get track uri from the browser url (ex. https://open.spotify.com/album/600ClrWRsAr7jZ0qjaBLHz?highlight=spotify:track:2Aq78kKI9yuloJQkcbhQbU)
                 url = self.driver.current_url
-                # print(url)
-                track_tag = 'highlight='
-                track_uri = url[url.index(track_tag) + len(track_tag):]
-                # print("FEATURED TRACK URI: ", track_uri)
-                self.all_track_uris.append(track_uri)
+
+                # Add track uri and link song
+                if 'track' in url:
+                    track_tag = 'highlight='
+                    track_uri = url[url.index(track_tag) + len(track_tag):]
+                    self.all_track_uris.append(track_uri)
+                    print("Song: {}").format(url)
+                # Anything other than songs will only be linked
+                elif 'album' in url:
+                    print("Album: {}").format(url)
+                elif 'artist' in url:
+                    print("Artist: {}").format(url)
+                elif 'playlist' in url:
+                    print("Playlist: {}").format(url)
+                elif 'episode' in url:
+                    print("Podcast episode: {}").format(url)
+                elif 'show' in url:
+                    print("Podcast: {}").format(url)
                 self.driver.close()
 
                 # Switch back to instagram window
