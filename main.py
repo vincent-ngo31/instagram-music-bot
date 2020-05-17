@@ -1,7 +1,9 @@
 import json
 import requests
+
 from time import sleep
 from datetime import datetime
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -167,6 +169,7 @@ class InstagramMusicBot:
         response_json = response.json()
         self.playlist_id = response_json['id']
 
-bot = InstagramMusicBot()
-bot.get_songs_from_stories()
-bot.add_songs_to_playlist()
+if __name__ == '__main__':
+    bot = InstagramMusicBot()
+    bot.get_songs_from_stories()
+    bot.add_songs_to_playlist() 
