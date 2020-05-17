@@ -1,22 +1,3 @@
-"""
-Tools
-- Selenium
-- Spotify Web API
-
-Actions:
-- Scrapes Spotify OAuth tokens
-- Logs in to Instagram and Spotify with your accounts
-- Views the Stories of the users you follow
-- Checks if they shared a Spotify song on their story
-- If so, adds it to a new custom “Instagram Music” playlist
-- Reruns once every 24 hours
-
-To-do:
-- Automate script to run once a day
-- Figure out token stuff
-- Add user input functionality
-"""
-
 import json
 import requests
 from time import sleep
@@ -26,11 +7,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
 
 from secrets import spotify_user_id, spotify_password, instagram_user_id, instagram_password
 
-class InstagramToSpotifyBot:
+class InstagramMusicBot:
     def __init__(self):
         self.current_time = datetime.now().strftime("%d-%b-%Y")
         self.spotify_user_id = spotify_user_id
@@ -57,7 +38,6 @@ class InstagramToSpotifyBot:
         self.wait(EC.presence_of_element_located((By.NAME, "username")))
         self.login_to_instagram(instagram_user_id, instagram_password)
 
-
     def get_songs_from_stories(self):
         # Start watching stories
         self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']"))).click()
@@ -67,12 +47,12 @@ class InstagramToSpotifyBot:
 
             try:
                 # "Play on Spotify" link
-                self.driver.find_element_by_xpath("//div[contains(text(), 'Play on Spotify')]").click()
+                self.retrying_find_click()
         
                 # "Open Spotify" pop-up
                 self.driver.find_element_by_class_name("vbsLk").click()
                 self.driver.switch_to_window(self.driver.window_handles[1])
-                self.wait(EC.url_contains('spotify'))
+                self.wait(EC.url_contains('track:'))
 
                 url = self.driver.current_url
 
@@ -81,18 +61,18 @@ class InstagramToSpotifyBot:
                     track_tag = 'highlight='
                     track_uri = url[url.index(track_tag) + len(track_tag):]
                     self.all_track_uris.append(track_uri)
-                    print("Song: {}").format(url)
+                    print("Song found: {}".format(url))
                 # Anything other than songs will only be linked
                 elif 'album' in url:
-                    print("Album: {}").format(url)
+                    print("Album found: {}".format(url))
                 elif 'artist' in url:
-                    print("Artist: {}").format(url)
+                    print("Artist found: {}".format(url))
                 elif 'playlist' in url:
-                    print("Playlist: {}").format(url)
+                    print("Playlist found: {}".format(url))
                 elif 'episode' in url:
-                    print("Podcast episode: {}").format(url)
+                    print("Podcast episode found: {}".format(url))
                 elif 'show' in url:
-                    print("Podcast: {}").format(url)
+                    print("Podcast found: {}".format(url))
                 self.driver.close()
 
                 # Switch back to instagram window
@@ -133,7 +113,7 @@ class InstagramToSpotifyBot:
             return post_response.json()
 
         else:
-            print("No songs recommended today :(")
+            print("No songs were shared today!")
             self.driver.quit()
 
     def wait(self, expected_condition):
@@ -155,7 +135,18 @@ class InstagramToSpotifyBot:
         self.driver.find_element_by_name("password").send_keys(spotify_password)
         self.driver.find_element_by_id("login-button").click()
         self.driver.implicitly_wait(10)
-        
+    
+    def retrying_find_click(self):
+        attempts = 0
+        while(attempts < 2):
+            try:
+                self.driver.find_element_by_xpath("//div[contains(text(), 'Play on Spotify')]").click()
+                return
+            except StaleElementReferenceException:
+                pass
+            attempts += 1
+        return StaleElementReferenceException
+
     def create_playlist(self):
         playlist_name = "Instagram Music ({})".format(self.current_time)
         request_body = json.dumps({
@@ -176,49 +167,6 @@ class InstagramToSpotifyBot:
         response_json = response.json()
         self.playlist_id = response_json['id']
 
-    # def _authorize_spotify(self):
-    #     query = "https://accounts.spotify.com/authorize"
-    #     scope = "playlist-read-private playlist-read-collaborative"
-    #     redirect_uri = "http://localhost:8888/callback"
-    #     response = requests.get(
-    #         query,
-    #         params={
-    #             "client_id": client_id,
-    #             "response_type": "code",
-    #             "redirect_uri": redirect_uri,
-    #             "scope": scope
-    #         }
-    #     )
-    #     authorization_code = response
-
-    #     request_body = json.dumps({
-    #         "grant_type": "authorization_code",
-    #         "code": authorization_code,
-    #         "redirect_uri": redirect_uri,
-    #     })
-
-    #     query = "https://accounts.spotify.com/api/token"
-    #     response = requests.post(
-    #         query,
-    #         data=request_body,
-    #         headers={
-    #             "Authorization": "Basic {}".format(client_encoded)
-    #         }
-    #     )
-    #     tokens = response.json()
-    #     print(tokens['access_token'])
-    
-    # def func(self):
-    #     get_query = "https://api.spotify.com/v1/users/{}/playlists".format(spotify_user_id)
-    #     get_response = requests.get(
-    #         get_query,
-    #         headers={
-    #             "Authorization": "Bearer {}".format(spotify_token)
-    #         }
-    #     )
-
-    #     print(get_response.json())
-
-bot = InstagramToSpotifyBot()
+bot = InstagramMusicBot()
 bot.get_songs_from_stories()
 bot.add_songs_to_playlist()
