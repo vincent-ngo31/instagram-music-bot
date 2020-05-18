@@ -23,10 +23,10 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 ### What it does
 * Scrapes Spotify OAuth token
 * Logs into Instagram and Spotify with your accounts
-* Views the Stories of the users you follow
+* Views the Stories of the users you follow (1 sec. per Stories post)
 * Checks if someone shared a Spotify track, album, playlist, artist, podcast, or podcast episode on their story
 * If so, displays a Spotify web player link to those media
-* Once the bot is finished viewing stories, it generates a new custom “Instagram Music” playlist and adds all shared tracks to it
+* Once the bot is finished viewing stories, it generates a new custom “Instagram Music” playlist and adds all shared tracks 
 
 ### To Do
 * Tests
