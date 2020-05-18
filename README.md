@@ -12,6 +12,7 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 
 2) Put your Spotify and Instagram login infomation into the secrets.py file
     * To find your Spotify User ID, log into Spotify, go into Account Overview, and look at your **Username**
+    ![alt text](images/spotify_userid.png)
 
 3) Run script
 `python3 main.py`
@@ -22,11 +23,15 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 
 ### What it does
 * Scrapes Spotify OAuth token
+   ![alt text](images/spotify_token_example.png)
 * Logs into Instagram and Spotify with your accounts
 * Views the Stories of the users you follow (1 sec. per Stories post)
 * Checks if someone shared a Spotify track, album, playlist, artist, podcast, or podcast episode on their story
+   ![alt text](images/shared_music.png)
 * If so, displays a Spotify web player link to those media
+   ![alt text](images/bot_output.png)
 * Once the bot is finished viewing stories, it generates a new custom “Instagram Music” playlist and adds all shared tracks 
+   ![alt text](images/new_playlist.png)
 
 ### To Do
 * Tests
