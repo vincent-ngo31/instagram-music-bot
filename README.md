@@ -39,5 +39,5 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 * Bypass users who are currently "Live" on Instagram
 
 ### Notes
-* This bot mimics the user, so after you run the script, an automated browser window will pop up and execute all commands. You can let it run in the background, and once it's finished, expect a brand new playlist in your Spotify!
+* This bot mimics the user, so after you run the script, an automated browser window will pop up and execute all commands. Keep the browser visible, and once it's finished it'll close automatically. Then, expect a brand new playlist in your Spotify!
 
