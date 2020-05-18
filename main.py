@@ -47,10 +47,15 @@ class InstagramMusicBot:
 
         while self.wait(EC.url_contains('stories')):
 
+            
             try:
+                
                 # "Play on Spotify" link
-                self.retrying_find_click()
-        
+                self.retrying_spotify_click()
+                
+                # Get sharer's username
+                user_sharer = self.driver.find_element_by_xpath("//a[@class='FPmhX notranslate  R4sSg']").get_attribute("title")
+
                 # "Open Spotify" pop-up
                 self.driver.find_element_by_class_name("vbsLk").click()
                 self.driver.switch_to_window(self.driver.window_handles[1])
@@ -63,18 +68,18 @@ class InstagramMusicBot:
                     track_tag = 'highlight='
                     track_uri = url[url.index(track_tag) + len(track_tag):]
                     self.all_track_uris.append(track_uri)
-                    print("Song found: {}".format(url))
+                    print("Song shared by {}: {}".format(user_sharer, url))
                 # Anything other than songs will only be linked
                 elif 'album' in url:
-                    print("Album found: {}".format(url))
+                    print("Album shared by {}: {}".format(user_sharer, url))
                 elif 'artist' in url:
-                    print("Artist found: {}".format(url))
+                    print("Artist shared by {}: {}".format(user_sharer, url))
                 elif 'playlist' in url:
-                    print("Playlist found: {}".format(url))
+                    print("Playlist shared by {}: {}".format(user_sharer, url))
                 elif 'episode' in url:
-                    print("Podcast episode found: {}".format(url))
+                    print("Podcast shared by {}: {}".format(user_sharer, url))
                 elif 'show' in url:
-                    print("Podcast found: {}".format(url))
+                    print("Podcast shared by {}: {}".format(user_sharer, url))
                 self.driver.close()
 
                 # Switch back to instagram window
@@ -120,7 +125,7 @@ class InstagramMusicBot:
 
     def wait(self, expected_condition):
         try:
-            return WebDriverWait(self.driver, 10).until(expected_condition)
+            return WebDriverWait(self.driver, 5).until(expected_condition)
         except TimeoutException:
             pass
     
@@ -128,9 +133,12 @@ class InstagramMusicBot:
         self.driver.find_element_by_name("username").send_keys(instagram_user_id)
         self.driver.find_element_by_name("password").send_keys(instagram_password)
         self.driver.find_element_by_xpath("//button[@type='submit']").click()
-        self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]")))
-        self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
-    
+        # First guaranteed pop-up
+        self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))).click()
+        # Second occasional pop-up
+        if self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
+            self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
+
     def login_to_spotify(self, spotify_user_id, spotify_password):
         self.wait(EC.presence_of_element_located((By.NAME, "username")))
         self.driver.find_element_by_name("username").send_keys(spotify_user_id)
@@ -138,7 +146,7 @@ class InstagramMusicBot:
         self.driver.find_element_by_id("login-button").click()
         self.driver.implicitly_wait(10)
     
-    def retrying_find_click(self):
+    def retrying_spotify_click(self):
         attempts = 0
         while(attempts < 2):
             try:
@@ -172,4 +180,4 @@ class InstagramMusicBot:
 if __name__ == '__main__':
     bot = InstagramMusicBot()
     bot.get_songs_from_stories()
-    bot.add_songs_to_playlist() 
+    bot.add_songs_to_playlist()
