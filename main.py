@@ -140,18 +140,26 @@ class InstagramMusicBot:
             pass
     
     def login_to_instagram(self, instagram_user_id, instagram_password):
-        driver.find_element_by_name("username").send_keys(instagram_user_id)
-        driver.find_element_by_name("password").send_keys(instagram_password)
-        driver.find_element_by_xpath("//button[@type='submit']").click()
-        if self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
-            driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
+        try:
+            driver.find_element_by_name("username").send_keys(instagram_user_id)
+            driver.find_element_by_name("password").send_keys(instagram_password)
+            driver.find_element_by_xpath("//button[@type='submit']").click()
+            if self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
+                driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
+        except Exception:
+            print("Failed to login. Please recheck your login info.")
+            driver.quit()
 
     def login_to_spotify(self, spotify_user_id, spotify_password):
-        self.wait(EC.presence_of_element_located((By.NAME, "username")))
-        driver.find_element_by_name("username").send_keys(spotify_user_id)
-        driver.find_element_by_name("password").send_keys(spotify_password)
-        driver.find_element_by_id("login-button").click()
-        driver.implicitly_wait(10)
+        try:
+            self.wait(EC.presence_of_element_located((By.NAME, "username")))
+            driver.find_element_by_name("username").send_keys(spotify_user_id)
+            driver.find_element_by_name("password").send_keys(spotify_password)
+            driver.find_element_by_id("login-button").click()
+            driver.implicitly_wait(10)
+        except Exception:
+            print("Failed to login. Please recheck your login info.")
+            driver.quit()
     
     def retrying_spotify_click(self):
         attempts = 0
@@ -166,10 +174,10 @@ class InstagramMusicBot:
 
     def check_live(self):
         url = driver.current_url
-        while 'live' in url:
+        if 'live' in url:
             driver.find_element_by_xpath("//svg[@aria-label='Close']").click()
             self.wait(EC.element_to_be_clickable((By.XPATH, "//canvas[@class='CfWVH']"))).click()
-            # driver.find_element_by_xpath("//canvas[@class='CfWVH']")
+            self.check_live()
     
     def create_playlist(self, spotify_user_id):
         playlist_name = "Instagram Music ({})".format(self.current_time)
