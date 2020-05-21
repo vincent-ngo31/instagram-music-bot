@@ -25,28 +25,36 @@ class InstagramMusicBot:
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_experimental_option("excludeSwitches", ['enable-automation'])
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--mute-audio")
+        chrome_options.add_argument('start-maximized')
         self.driver = webdriver.Chrome(options=chrome_options)
 
         # Get OAuth token and log in to Spotify
-        self.driver.get("https://developer.spotify.com/console/post-playlists/?user_id=&body=%7B%22name%22%3A%22New%20Playlist%22%2C%22description%22%3A%22New%20playlist%20description%22%2C%22public%22%3Afalse%7D")
+        print('Scraping token...')
+        SPOTIFY_URL = "https://developer.spotify.com/console/post-playlists/?user_id=&body=%7B%22name%22%3A%22New%20Playlist%22%2C%22description%22%3A%22New%20playlist%20description%22%2C%22public%22%3Afalse%7D"
+        self.driver.get(SPOTIFY_URL)
         self.driver.find_element_by_xpath("//button[contains(text(), 'Get Token')]").click()
         self.wait(EC.element_to_be_clickable((By.ID, "oauthRequestToken")))
         self.driver.find_element_by_id("oauthRequestToken").click()
+        print("Logging into Spotify...")
         self.login_to_spotify(spotify_user_id, spotify_password)
         self.spotify_token = self.driver.find_element_by_id("oauth-input").get_attribute("value")
 
         # Login to Instagram
+        print("Logging into Instagram...")
         self.driver.get("https://instagram.com")
         self.wait(EC.presence_of_element_located((By.NAME, "username")))
         self.login_to_instagram(instagram_user_id, instagram_password)
 
     def get_songs_from_stories(self):
         # Start watching stories
-        self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']"))).click()
+        self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']")))
+        self.driver.find_element_by_xpath("//div[@class='RR-M-  QN629']").click()
         print('Viewing stories...')
 
         while self.wait(EC.url_contains('stories')):
-
             
             try:
                 
@@ -59,16 +67,20 @@ class InstagramMusicBot:
                 # "Open Spotify" pop-up
                 self.driver.find_element_by_class_name("vbsLk").click()
                 self.driver.switch_to_window(self.driver.window_handles[1])
-                self.wait(EC.url_contains('track:'))
+                self.wait(EC.url_contains('track'))
 
                 url = self.driver.current_url
 
                 # Add track uri and link song
                 if 'track' in url:
-                    track_tag = 'highlight='
-                    track_uri = url[url.index(track_tag) + len(track_tag):]
+                    track_tag = 'track/'
+                    end_tag = '?'
+                    prefix = 'spotify:track:'
+                    # track_uri = url[url.index(track_tag) + len(track_tag):]
+                    track_uri = prefix + url[url.index(track_tag) + len(track_tag) : url.index(end_tag)]
                     self.all_track_uris.append(track_uri)
                     print("Song shared by {}: {}".format(user_sharer, url))
+               
                 # Anything other than songs will only be linked
                 elif 'album' in url:
                     print("Album shared by {}: {}".format(user_sharer, url))
@@ -133,9 +145,6 @@ class InstagramMusicBot:
         self.driver.find_element_by_name("username").send_keys(instagram_user_id)
         self.driver.find_element_by_name("password").send_keys(instagram_password)
         self.driver.find_element_by_xpath("//button[@type='submit']").click()
-        # First guaranteed pop-up
-        self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))).click()
-        # Second occasional pop-up
         if self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
             self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
 
