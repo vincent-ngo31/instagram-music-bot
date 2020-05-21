@@ -8,14 +8,14 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 
 ### Local Setup
 1) Install dependencies
-`pip3 install -r requirements.txt`
+`pip install -r requirements.txt`
 
 2) Put your Spotify and Instagram login infomation into the secrets.py file
     * To find your Spotify User ID, search for your own profile on Spotify web player, and it should be in the url
     ![alt text](images/spotify_userid.png)
 
 3) Run script
-`python3 main.py`
+`python main.py`
 
   [Selenium Webdriver]: <https://www.selenium.dev/documentation/en/webdriver/>
   [Spotify Web API]: <https://developer.spotify.com/documentation/web-api/>
@@ -36,7 +36,7 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 ### To Do
 * Tests
 * More error handling
-* Bypass users who are currently "Live" on Instagram
+* Implement "loop once a day" feature
 
 ### Notes
 * This bot mimics the user, so after you run the script, an automated browser window will pop up and execute all commands. Keep the browser visible, and once it's finished it'll close automatically. Then, expect a brand new playlist in your Spotify!
