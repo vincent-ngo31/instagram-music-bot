@@ -35,7 +35,7 @@ Example: `python main.py --spotify-user YOUR_USER_ID --spotify-password YOUR_PAS
 * Scrapes Spotify OAuth token
    ![alt text](images/spotify_token_example.png)
 * Logs into Instagram and Spotify with your accounts
-* Views the Stories of the users you follow (< 1 sec. per Stories post)
+* Views the unread Stories of the users you follow (< 1 sec. per Stories post)
 * Checks if someone shared a Spotify track, album, playlist, artist, podcast, or podcast episode on their story
    ![alt text](images/shared_music.png)
 * If so, displays Spotify web player links to those media and the users who shared them
