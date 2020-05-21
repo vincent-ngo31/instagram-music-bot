@@ -1,5 +1,5 @@
 # Instagram Music Bot
-A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. Works with Google Chrome.
+A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. After initializing the script, just let it run in the background. Once it's finished, expect a brand new playlist in your Spotify account! Works with Google Chrome.
 
 ### Built With:
 * [Selenium Webdriver]
@@ -10,7 +10,7 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 1) Install dependencies
 `pip install -r requirements.txt`
 
-2) Put your Spotify and Instagram login infomation into the `secrets.py` file
+2) Put your Spotify and Instagram login information into the secrets.py file
     * To find your Spotify User ID, search for your own profile on Spotify web player, and it should be in the url
     ![alt text](images/spotify_userid.png)
 
@@ -37,7 +37,3 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 * Tests
 * More error handling
 * Implement "loop once a day" feature
-
-### Notes
-* This bot mimics the user, so after you run the script, an automated browser window will pop up and execute all commands. Keep the browser visible, and once it's finished it'll close automatically. Then, expect a brand new playlist in your Spotify!
-
