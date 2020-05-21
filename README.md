@@ -10,7 +10,7 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 1) Install dependencies
 `pip install -r requirements.txt`
 
-2) Put your Spotify and Instagram login infomation into the secrets.py file
+2) Put your Spotify and Instagram login infomation into the `secrets.py` file
     * To find your Spotify User ID, search for your own profile on Spotify web player, and it should be in the url
     ![alt text](images/spotify_userid.png)
 
