@@ -203,7 +203,7 @@ if __name__ == '__main__':
     parser.add_argument("--ig-user", required=True)
     parser.add_argument("--ig-password", required=True)
     parser.add_argument("--headless", action="store_true")
-    parser.add_argument("--schedule", type=int, default=None)
+    parser.add_argument("--schedule", default=None)
     args = parser.parse_args()
 
     chrome_options = webdriver.ChromeOptions()
