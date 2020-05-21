@@ -1,5 +1,5 @@
 # Instagram Music Bot
-A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. Shared albums, playlists, artists, podcasts, and podcast episodes will have only links provided.
+A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. Works with Google Chrome.
 
 ### Built With:
 * [Selenium Webdriver]
