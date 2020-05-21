@@ -1,5 +1,5 @@
 # Instagram Music Bot
-A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. After initializing the script, just let it run in the background. Once it's finished, expect a brand new playlist in your Spotify account! Works with Google Chrome.
+A bot that will find music shared in Instagram Stories by users you follow, provide links to these songs, and add them to a custom Spotify playlist. Able to be run in the background and scheduled to run daily. Works with Google Chrome.
 
 ### Built With:
 * [Selenium Webdriver]
@@ -10,22 +10,32 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 1) Install dependencies
 `pip install -r requirements.txt`
 
-2) Put your Spotify and Instagram login information into the **secrets.py** file
-    * To find your Spotify User ID, search for your own profile on Spotify web player, and it should be in the url
-    ![alt text](images/spotify_userid.png)
+2) Run script with available arguments
 
-3) Run script
-`python main.py`
+   * Required arguments:
+      * `--spotify-user`: Spotify user ID
+         * To find your Spotify User ID, search for your own profile on Spotify web player, and it should be in the url
 
-  [Selenium Webdriver]: <https://www.selenium.dev/documentation/en/webdriver/>
-  [Spotify Web API]: <https://developer.spotify.com/documentation/web-api/>
-  [Requests Library v 2.23.0]: <https://requests.readthedocs.io/en/master/>
+            ![alt text](images/spotify_userid.png)
+           
+      * `--spotify-password`: Spotify password
+      
+      * `--ig-user`: Instagram username
+      
+      * `--ig-password`: Instagram password
+   * Optional arguments
+      * `--headless`: Enable script to run silently in the background (RECOMMENDED)
+      
+      * `--schedule`: Schedule script to run once daily at the time you specify
+         * Specify time in string form, e.g. `"01:30"` or `"13:30"`
+
+Example: `python main.py --spotify-user YOUR_USER_ID --spotify-password YOUR_PASSWORD --ig-user YOUR_USERNAME --ig-password YOUR_PASSWORD --headless --schedule "12:00"`
 
 ### What it does
 * Scrapes Spotify OAuth token
    ![alt text](images/spotify_token_example.png)
 * Logs into Instagram and Spotify with your accounts
-* Views the Stories of the users you follow (1 sec. per Stories post)
+* Views the Stories of the users you follow (< 1 sec. per Stories post)
 * Checks if someone shared a Spotify track, album, playlist, artist, podcast, or podcast episode on their story
    ![alt text](images/shared_music.png)
 * If so, displays Spotify web player links to those media and the users who shared them
@@ -36,4 +46,7 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
 ### To Do
 * Tests
 * More error handling
-* Include option to automatically run once a day
+
+  [Selenium Webdriver]: <https://www.selenium.dev/documentation/en/webdriver/>
+  [Spotify Web API]: <https://developer.spotify.com/documentation/web-api/>
+  [Requests Library v 2.23.0]: <https://requests.readthedocs.io/en/master/>
