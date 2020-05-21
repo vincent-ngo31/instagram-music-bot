@@ -175,8 +175,9 @@ class InstagramMusicBot:
     def check_live(self):
         url = driver.current_url
         if 'live' in url:
-            driver.find_element_by_xpath("//svg[@aria-label='Close']").click()
-            self.wait(EC.element_to_be_clickable((By.XPATH, "//canvas[@class='CfWVH']"))).click()
+            driver.find_element_by_xpath("//button[@class='wpO6b ']").click()
+            self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']")))
+            driver.find_element_by_xpath("//div[@class='RR-M-  QN629']").click()
             self.check_live()
     
     def create_playlist(self, spotify_user_id):

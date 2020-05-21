@@ -28,6 +28,8 @@ A bot that will find music shared in Instagram Stories by users you follow, prov
       
       * `--schedule`: Schedule script to run once daily at the time you specify
          * Specify time in string form, e.g. `"01:30"` or `"13:30"`
+         * If the bot is currently scheduled, you can always stop it by pressing `Ctrl-C`
+         * If you want to run the script independently without disturbing the current schedule, simply open a new terminal and run the script there
 
 Example: `python main.py --spotify-user YOUR_USER_ID --spotify-password YOUR_PASSWORD --ig-user YOUR_USERNAME --ig-password YOUR_PASSWORD --headless --schedule "12:00"`
 
