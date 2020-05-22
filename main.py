@@ -44,11 +44,8 @@ class InstagramMusicBot:
         self.login_to_instagram(instagram_user_id, instagram_password)
 
     def get_songs_from_stories(self):
-        # Start watching stories
-        self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']")))
-        driver.find_element_by_xpath("//div[@class='RR-M-  QN629']").click()
         
-        # Check for "Live" accounts and bypass
+        # Start watching stories and bypass "Live" accounts
         self.check_live()
         
         print('Viewing stories...')
@@ -134,8 +131,9 @@ class InstagramMusicBot:
             driver.quit()
 
     def wait(self, expected_condition):
+        ignored_exceptions = (NoSuchElementException, StaleElementReferenceException)
         try:
-            return WebDriverWait(driver, 5).until(expected_condition)
+            return WebDriverWait(driver, 5, ignored_exceptions=ignored_exceptions).until(expected_condition)
         except TimeoutException:
             pass
     
@@ -144,7 +142,7 @@ class InstagramMusicBot:
             driver.find_element_by_name("username").send_keys(instagram_user_id)
             driver.find_element_by_name("password").send_keys(instagram_password)
             driver.find_element_by_xpath("//button[@type='submit']").click()
-            if self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
+            while self.wait(EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'Not Now')]"))):
                 driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]").click()
         except Exception:
             print("Failed to login. Please recheck your login info.")
@@ -173,12 +171,24 @@ class InstagramMusicBot:
         return StaleElementReferenceException
 
     def check_live(self):
-        url = driver.current_url
-        if 'live' in url:
-            driver.find_element_by_xpath("//button[@class='wpO6b ']").click()
-            self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='RR-M-  QN629']")))
-            driver.find_element_by_xpath("//div[@class='RR-M-  QN629']").click()
-            self.check_live()
+        # First story
+        driver.implicitly_wait(2)
+        self.wait(EC.element_to_be_clickable((By.XPATH, "//li[@style='transform: translateX(10px);']")))
+        first = driver.find_element_by_xpath("//li[@style='transform: translateX(10px);']")
+        px_trans = 10
+        first.click()
+
+        while self.wait(EC.url_contains('live')):
+            # Exit Live
+            self.wait(EC.element_to_be_clickable((By.XPATH, "//div[@class='u7g0U']")))
+            driver.find_element_by_xpath("//div[@class='u7g0U']").click()
+            
+            # Click on next story
+            driver.implicitly_wait(2)
+            px_trans = px_trans + 80
+            next_xpath = "//li[@style='transform: translateX({}px);']".format(str(px_trans))
+            self.wait(EC.element_to_be_clickable((By.XPATH, next_xpath)))
+            driver.find_element_by_xpath(next_xpath).click()
     
     def create_playlist(self, spotify_user_id):
         playlist_name = "Instagram Music ({})".format(self.current_time)
@@ -222,6 +232,7 @@ if __name__ == '__main__':
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--mute-audio")
         chrome_options.add_argument('start-maximized')
+        # chrome_options.add_argument('--remote-debugging-port=9222')
     driver = webdriver.Chrome(options=chrome_options)
     
     if args.schedule is not None:
