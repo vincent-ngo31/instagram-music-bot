@@ -236,7 +236,7 @@ if __name__ == '__main__':
     driver = webdriver.Chrome(options=chrome_options)
     
     if args.schedule is not None:
-        schedule.every().day.at(args.schedule).do(
+        schedule.every().day.at(str(args.schedule)).do(
             run, driver=driver, spotify_user_id=args.spotify_user, spotify_password=args.spotify_password, instagram_user_id=args.ig_user, instagram_password=args.ig_password
         )
         while True:
