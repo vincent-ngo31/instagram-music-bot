@@ -175,7 +175,7 @@ class InstagramMusicBot:
         driver.implicitly_wait(2)
         self.wait(EC.element_to_be_clickable((By.XPATH, "//li[@style='transform: translateX(10px);']")))
         first = driver.find_element_by_xpath("//li[@style='transform: translateX(10px);']")
-        px_trans = 10
+        px_trans = -70
         first.click()
 
         while self.wait(EC.url_contains('live')):
