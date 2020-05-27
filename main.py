@@ -72,7 +72,6 @@ class InstagramMusicBot:
                     track_tag = 'track/'
                     end_tag = '?'
                     prefix = 'spotify:track:'
-                    # track_uri = url[url.index(track_tag) + len(track_tag):]
                     track_uri = prefix + url[url.index(track_tag) + len(track_tag) : url.index(end_tag)]
                     self.all_track_uris.append(track_uri)
                     print("Song shared by {}: {}".format(user_sharer, url))
@@ -195,7 +194,7 @@ class InstagramMusicBot:
         playlist_name = "Instagram Music ({})".format(self.current_time)
         request_body = json.dumps({
             "name": playlist_name,
-            "description": "Scraped from my Stories feed using Instagram bot (@vincentdngo)",
+            "description": "https://github.com/vincent-ngo31/instagram-music-bot",
             "public": False
         })
 
