@@ -6,6 +6,7 @@ import schedule
 import time
 from datetime import datetime
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -233,7 +234,7 @@ if __name__ == '__main__':
         chrome_options.add_argument("--mute-audio")
         chrome_options.add_argument('start-maximized')
         # chrome_options.add_argument('--remote-debugging-port=9222')
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     
     if args.schedule is not None:
         schedule.every().day.at(str(args.schedule)).do(
