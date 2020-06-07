@@ -62,7 +62,7 @@ class InstagramMusicBot:
 
                 # "Open Spotify" pop-up
                 driver.find_element_by_class_name("vbsLk").click()
-                driver.switch_to_window(driver.window_handles[1])
+                driver.switch_to.window(driver.window_handles[1])
                 self.wait(EC.url_contains('track'))
 
                 url = driver.current_url
@@ -90,7 +90,7 @@ class InstagramMusicBot:
                 driver.close()
 
                 # Switch back to instagram window
-                driver.switch_to_window(driver.window_handles[0])
+                driver.switch_to.window(driver.window_handles[0])
 
                 # Input "right arrow" key
                 driver.find_element_by_css_selector("body").send_keys(Keys.RIGHT)
